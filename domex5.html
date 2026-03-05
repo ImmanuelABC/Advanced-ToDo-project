@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Todo Pro</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#f3f3f3;
+  padding:40px;
+}
+
+.container{
+  width:320px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 0 12px rgba(0,0,0,0.1);
+}
+
+li{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:8px;
+  background:#eee;
+  padding:6px;
+}
+
+.done span{
+  text-decoration: line-through;
+  color: gray;
+}
+
+.filters{
+  margin-top:10px;
+}
+
+.filters button{
+  margin-right:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h3>Todo Pro</h3>
+
+  <input id="taskInput" placeholder="输入任务">
+  <button onclick="addTask()">Add</button> 
+    <div class="filters"> 
+        <button onclick="setFilter('all')">全部</button>
+        <button onclick="setFilter('active')">未完成</button>
+        <button onclick="setFilter('done')">已完成</button>
+    </div>
+
+  <ul id="list"></ul>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks")) || []
+let filter = "all"
+
+render()
+
+// 回车添加
+taskInput.addEventListener("keydown", e=>{
+  if(e.key==="Enter") addTask()
+})
+
+
+// ⭐ 添加任务（现在是对象，不再是字符串）
+function addTask(){
+  const value = taskInput.value.trim()
+  if(!value) return
+
+  tasks.push({
+    text:value,
+    done:false
+  })
+
+  save()
+  taskInput.value=""
+  render()
+}
+
+
+// ⭐ 勾选完成
+function toggle(index){
+  tasks[index].done = !tasks[index].done
+  save()
+  render()
+}
+
+
+// ⭐ 删除
+function removeTask(index){
+  tasks.splice(index,1)
+  save()
+  render()
+}
+
+
+// ⭐ 双击编辑
+function editTask(index){
+  const newText = prompt("修改任务：", tasks[index].text)
+  if(newText){
+    tasks[index].text = newText
+    save()
+    render()
+  }
+}
+
+
+// ⭐ 过滤器
+function setFilter(type){
+  filter = type
+  render()
+}
+
+
+// ⭐ 保存
+function save(){
+  localStorage.setItem("tasks", JSON.stringify(tasks))
+}
+
+
+// ⭐⭐⭐ 核心渲染
+function render(){
+  list.innerHTML=""
+
+  let filtered = tasks.filter(task=>{
+    if(filter==="active") return !task.done
+    if(filter==="done") return task.done
+    return true
+  })
+
+  filtered.forEach(task=>{
+    const realIndex = tasks.indexOf(task)
+
+    const li = document.createElement("li")
+
+    if(task.done) li.classList.add("done")
+
+    li.innerHTML = `
+      <input type="checkbox"
+        ${task.done?"checked":""}
+        onclick="toggle(${realIndex})">
+
+      <span ondblclick="editTask(${realIndex})">
+        ${task.text}
+      </span>
+
+      <button onclick="removeTask(${realIndex})">❌</button>
+    `
+
+    list.appendChild(li)
+  })
+}
+</script>
+
+</body>
+</html>

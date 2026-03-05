@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<input id="text" placeholder="输入内容">
+<button onclick="add()">添加</button>
+
+<ul id="list"></ul>
+
+<script>
+function add() {
+  const value = document.getElementById("text").value
+
+  const li = document.createElement("li")
+
+  li.innerText = value
+
+  document.getElementById("list").appendChild(li)
+}
+</script>
+
+</body>
+</html>

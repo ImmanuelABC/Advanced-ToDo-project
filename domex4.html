@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Todo App</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#f6f6f6;
+  padding:40px;
+}
+
+.container{
+  width:300px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+input{
+  width:70%;
+  padding:6px;
+}
+
+button{
+  padding:6px 10px;
+  cursor:pointer;
+}
+
+li{
+  margin-top:8px;
+  background:#eee;
+  padding:6px;
+  display:flex;
+  justify-content:space-between;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h3>Todo List</h3>
+
+  <input id="taskInput" placeholder="输入任务">
+  <button onclick="addTask()">Add</button>
+
+  <ul id="list"></ul>
+</div>
+
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks")) || []
+
+render()
+
+// ⭐ 回车添加
+document.getElementById("taskInput")
+.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    addTask()
+  }
+})
+
+
+function addTask(){
+  const input = document.getElementById("taskInput")
+  const value = input.value.trim()
+
+  if(!value) return
+
+  tasks.push(value)
+
+  save()
+
+  input.value=""
+
+  render()
+}
+
+
+function removeTask(index){
+  tasks.splice(index,1)
+
+  save()
+
+  render()
+}
+
+
+// ⭐ 保存到本地（重点新知识）
+function save(){
+  localStorage.setItem("tasks", JSON.stringify(tasks))
+}
+
+
+function render(){
+  const ul = document.getElementById("list")
+
+  ul.innerHTML=""
+
+  tasks.forEach((task,index)=>{
+    const li=document.createElement("li")
+
+    li.innerHTML=`
+      ${task}
+      <button onclick="removeTask(${index})">❌</button>
+    `
+
+    ul.appendChild(li)
+  })
+}
+</script>
+</body>
+</html>
